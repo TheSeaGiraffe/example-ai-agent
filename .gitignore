@@ -1,0 +1,5 @@
+# General project artifacts
+.env*
+
+# Python artifacts
+.venv/
