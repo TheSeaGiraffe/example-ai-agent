@@ -3,3 +3,4 @@
 
 # Python artifacts
 .venv/
+__pycache__/
