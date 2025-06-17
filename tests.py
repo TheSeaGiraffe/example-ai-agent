@@ -3,6 +3,7 @@ from pathlib import Path
 
 from functions.get_file_content import MAX_CONTENT_LENGTH, get_file_content
 from functions.get_files_info import get_files_info
+from functions.write_file import write_file
 
 
 class TestGetFilesInfo(unittest.TestCase):
@@ -40,7 +41,7 @@ class TestGetFileContent(unittest.TestCase):
         "calc_calc": "calculator/pkg/calculator.py",
     }
 
-    def get_golden_file(self, golden_file: Path) -> str:
+    def get_golden_file(self, golden_file: str) -> str:
         with open(golden_file) as golden:
             return golden.read()
 
@@ -65,6 +66,38 @@ class TestGetFileContent(unittest.TestCase):
     def test_non_existant_cat_file(self):
         got = get_file_content(self.working_dir, "/bin/cat")
         want = 'Error: Cannot read "/bin/cat" as it is outside the permitted working directory'
+        self.assertEqual(got, want)
+
+
+class TestWriteFile(unittest.TestCase):
+    lorem_file_path = "calculator/lorem.txt"
+
+    def read_file(self) -> str:
+        with open(self.lorem_file_path) as lorem:
+            return lorem.read()
+
+    def write_file(self, contents: str):
+        with open(self.lorem_file_path, "w") as lorem:
+            lorem.write(contents)
+
+    def test_lorem(self):
+        old_lorem = self.read_file()
+        got = write_file("calculator", "lorem.txt", "wait, this isn't lorem ipsum")
+        want = 'Successfully wrote to "lorem.txt" (28 characters written)'
+        self.write_file(old_lorem)
+        self.assertEqual(got, want)
+
+    def test_pkg_more_lorem(self):
+        got = write_file(
+            "calculator", "pkg/morelorem.txt", "lorem ipsum dolor sit amet"
+        )
+        want = 'Successfully wrote to "pkg/morelorem.txt" (26 characters written)'
+        Path("calculator/pkg/morelorem.txt").unlink(missing_ok=True)
+        self.assertEqual(got, want)
+
+    def test_tmp_text(self):
+        got = write_file("calculator", "/tmp/temp.txt", "this should not be allowed")
+        want = 'Error: Cannot write to "/tmp/temp.txt" as it is outside the permitted working directory'
         self.assertEqual(got, want)
 
 

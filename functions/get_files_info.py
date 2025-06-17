@@ -20,8 +20,16 @@ def get_files_info(working_directory: str, directory: str = None) -> str:
     Returns
     -------
     str
-        A string containing all of the files and directories in 'directory'. The string
-        is formatted as a list with the following form:
+        On error:
+
+        - A message indicating that the specified directory isn't actually a directory.
+        - A message indicating that the specified directory is outside of the working
+          directory
+        - A message indicating that something went wrong when attempting to retrieve
+          information about the files in `directory`
+
+        On success: a string containing all of the files and directories in
+        'directory'. The string is formatted as a list with the following form:
 
         - file_or_directory: file_size=int bytes, is_dir=bool
         - ...

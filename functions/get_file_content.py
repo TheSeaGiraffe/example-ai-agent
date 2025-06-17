@@ -19,6 +19,14 @@ def get_file_content(working_directory: str, file_path: str) -> str:
 
     Returns
     -------
+    str
+        The following strings will be returned depending on whether any errors were
+        encountered:
+
+        - An error message indicating that the file is outside of the working directory
+        - An error message indicating that the file is actually not a file
+        - An error message indicating that a problem occurred when reading from the file
+        - On success, the contents of the file truncated at 10000 characters
     """
     final_path = Path(working_directory).joinpath(file_path.strip("/"))
 
