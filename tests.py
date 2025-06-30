@@ -3,6 +3,7 @@ from pathlib import Path
 
 from functions.get_file_content import MAX_CONTENT_LENGTH, get_file_content
 from functions.get_files_info import get_files_info
+from functions.run_python import run_python_file
 from functions.write_file import write_file
 
 
@@ -98,6 +99,35 @@ class TestWriteFile(unittest.TestCase):
     def test_tmp_text(self):
         got = write_file("calculator", "/tmp/temp.txt", "this should not be allowed")
         want = 'Error: Cannot write to "/tmp/temp.txt" as it is outside the permitted working directory'
+        self.assertEqual(got, want)
+
+
+class TestRunFile(unittest.TestCase):
+    def test_run_calc_main(self):
+        got = run_python_file("calculator", "main.py")
+        want = 'STDOUT: Calculator App\nUsage: python main.py "<expression>"\nExample: python main.py "3 + 5"\n'
+
+        self.assertEqual(got, want)
+
+    def test_run_calc_tests(self):
+        got = run_python_file("calculator", "tests.py")
+
+        want_parts = ["STDERR", "Ran 9 tests", "OK"]
+        for want_part in want_parts:
+            self.assertIn(want_part, got)
+
+    # Should error
+    def test_run_agent_main(self):
+        got = run_python_file("calculator", "../main.py")
+        want = 'Error: Cannot execute "../main.py" as it is outside the permitted working directory'
+
+        self.assertEqual(got, want)
+
+    # Should error
+    def test_run_nonexistent(self):
+        got = run_python_file("calculator", "nonexistent.py")
+        want = 'Error: File "nonexistent.py" not found.'
+
         self.assertEqual(got, want)
 
 

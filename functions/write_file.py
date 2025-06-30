@@ -1,5 +1,7 @@
 from pathlib import Path
 
+from .file_path_utils import is_file_outside_workdir
+
 
 def write_file(working_directory: str, file_path: str, content: str) -> str:
     """Write contents to a file.
@@ -29,8 +31,7 @@ def write_file(working_directory: str, file_path: str, content: str) -> str:
     final_path = Path(working_directory).joinpath(file_path.strip("/"))
 
     # Check if file path is outside of working directory
-    # if not (final_path.exists() and ".." not in str(final_path)):
-    if not (final_path.parent.exists() and ".." not in str(final_path)):
+    if is_file_outside_workdir(working_directory, file_path):
         return f'Error: Cannot write to "{file_path}" as it is outside the permitted working directory'
 
     # Create file if it doesn't exist

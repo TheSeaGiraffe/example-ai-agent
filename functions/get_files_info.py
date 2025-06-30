@@ -1,5 +1,7 @@
 from pathlib import Path
 
+from .file_path_utils import is_file_outside_workdir
+
 
 def get_files_info(working_directory: str, directory: str = None) -> str:
     """Return a list of the objects contained in the specified directory as well as some
@@ -42,8 +44,7 @@ def get_files_info(working_directory: str, directory: str = None) -> str:
         return f'Error: "{directory}" is not a directory'
 
     # Check that directory is in working_directory
-    # Consider using DeMorgan's Law here
-    if not (final_dir.exists() and ".." not in str(final_dir)):
+    if is_file_outside_workdir(working_directory, directory):
         return f'Error: Cannot list "{directory}" as it is outside the permitted working directory'
 
     # Get the contents of the specified directory

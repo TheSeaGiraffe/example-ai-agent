@@ -1,5 +1,7 @@
 from pathlib import Path
 
+from .file_path_utils import is_file_outside_workdir
+
 MAX_CONTENT_LENGTH = 10000
 
 
@@ -31,7 +33,7 @@ def get_file_content(working_directory: str, file_path: str) -> str:
     final_path = Path(working_directory).joinpath(file_path.strip("/"))
 
     # Check if file_path is outside of working_directory
-    if not (final_path.exists() and ".." not in str(final_path)):
+    if is_file_outside_workdir(working_directory, file_path):
         return f'Error: Cannot read "{file_path}" as it is outside the permitted working directory'
 
     # Check if file path is not a file
