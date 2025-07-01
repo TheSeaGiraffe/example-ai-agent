@@ -4,7 +4,16 @@ from argparse import Namespace
 
 from dotenv import load_dotenv
 from google import genai
+from google.genai import types
 from google.genai.types import Content, Part
+
+import functions.function_declarations as funcdecs
+
+available_functions = types.Tool(
+    function_declarations=[
+        funcdecs.schema_get_files_info,
+    ]
+)
 
 
 def parse_args() -> Namespace:
@@ -36,8 +45,24 @@ def main():
     # Generate content using model
     model = "gemini-2.0-flash-001"
     user_prompt = " ".join(args.prompt)
+    system_prompt = """
+    You are a helpful AI coding agent.
+
+    When a user asks a question or makes a request, make a function call plan. You can perform the following operations:
+
+    - List files and directories
+
+    All paths you provide should be relative to the working directory. You do not need to specify the working directory in your function calls as it is automatically injected for security reasons.
+    """
+
     messages = [Content(role="user", parts=[Part(text=user_prompt)])]
-    response = client.models.generate_content(model=model, contents=messages)
+    response = client.models.generate_content(
+        model=model,
+        contents=messages,
+        config=types.GenerateContentConfig(
+            tools=[available_functions], system_instruction=system_prompt
+        ),
+    )
 
     if args.verbose:
         print(f"User prompt: {user_prompt}")
@@ -45,7 +70,12 @@ def main():
         print(f"Response tokens: {verbose_token_count(response.text)}\n")
 
     print("Response:")
-    print(f"\n{response.text}")
+    function_calls = response.function_calls
+    if function_calls:
+        for function_call in function_calls:
+            print(f"Calling function: {function_call.name}({function_call.args})")
+    else:
+        print(f"\n{response.text}")
 
 
 if __name__ == "__main__":
