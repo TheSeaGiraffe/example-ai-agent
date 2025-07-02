@@ -12,6 +12,9 @@ import functions.function_declarations as funcdecs
 available_functions = types.Tool(
     function_declarations=[
         funcdecs.schema_get_files_info,
+        funcdecs.schema_get_file_content,
+        funcdecs.schema_run_python_file,
+        funcdecs.schema_write_file,
     ]
 )
 
@@ -51,6 +54,9 @@ def main():
     When a user asks a question or makes a request, make a function call plan. You can perform the following operations:
 
     - List files and directories
+    - Read file contents
+    - Execute Python files with optional arguments
+    - Write or overwrite files
 
     All paths you provide should be relative to the working directory. You do not need to specify the working directory in your function calls as it is automatically injected for security reasons.
     """
@@ -69,13 +75,13 @@ def main():
         print(f"Prompt tokens: {verbose_token_count(user_prompt)}")
         print(f"Response tokens: {verbose_token_count(response.text)}\n")
 
-    print("Response:")
+    # print("Response:")
     function_calls = response.function_calls
     if function_calls:
         for function_call in function_calls:
             print(f"Calling function: {function_call.name}({function_call.args})")
     else:
-        print(f"\n{response.text}")
+        print(f"Response: {response.text}")
 
 
 if __name__ == "__main__":
