@@ -8,6 +8,7 @@ from google.genai import types
 from google.genai.types import Content, Part
 
 import functions.function_declarations as funcdecs
+from functions.call_function import call_function
 
 available_functions = types.Tool(
     function_declarations=[
@@ -73,16 +74,30 @@ def main():
     if args.verbose:
         print(f"User prompt: {user_prompt}")
         print(f"Prompt tokens: {verbose_token_count(user_prompt)}")
-        print(f"Response tokens: {verbose_token_count(response.text)}\n")
+        # Will need to rethink how to handle this. Comment out for now.
+        # print(
+        #     f"Response tokens: {verbose_token_count(response.text) if response.text else 0}\n"
+        # )
 
-    # print("Response:")
     function_calls = response.function_calls
     if function_calls:
         for function_call in function_calls:
-            print(f"Calling function: {function_call.name}({function_call.args})")
+            function_call_results = call_function(function_call, args.verbose)
+            function_call_results_response = function_call_results.parts[
+                0
+            ].function_response.response
+            if function_call_results_response is None:
+                raise Exception(
+                    f'Function call "{function_call.name}" did not return a response'
+                )
+            if args.verbose:
+                print(f"-> {function_call_results_response}")
     else:
         print(f"Response: {response.text}")
 
 
 if __name__ == "__main__":
-    main()
+    try:
+        main()
+    except Exception as e:
+        print(f"Error running program: {e}")

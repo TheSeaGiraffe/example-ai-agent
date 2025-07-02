@@ -47,7 +47,7 @@ class TestGetFileContent(unittest.TestCase):
             return golden.read()
 
     def test_lorem(self):
-        got = get_file_content(self.working_dir, "lorem.txt")
+        got = get_file_content(self.working_dir, "lorem-test.txt")
         golden_file = self.golden_files["lorem"]
         lorem_trunc = f'{self.get_golden_file(golden_file)}...File "lorem.txt" truncated at {MAX_CONTENT_LENGTH} characters'
         self.assertEqual(lorem_trunc, got)
